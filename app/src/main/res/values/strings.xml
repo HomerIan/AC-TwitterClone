@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">TwitterClone</string>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+
+    <!-- Change the following strings as required -->
+    <string name="back4app_app_id">nD8V5Ahnh4x6TEgED6J70XzcmGKOMbH64xTmkaAO</string>
+    <string name="back4app_client_key">zbFhRLdxRP4QFELW2TJRqHsmu6Mxa2sHWVFFiBAq</string>
+
+    <string name="enter_email">Please enter an email...</string>
+    <string name="enter_username">Please enter an username...</string>
+    <string name="enter_password">Please enter an password...</string>
+
+    <!--Sign Up-->
+    <string name="img_logo">Twitter Logo</string>
+    <string name="signup_btn">Sign Up</string>
+    <string name="login_label">Already have an Account?</string>
+    <string name="text_login">Log in.</string>
+
+    <!--Log In-->
+    <string name="signUp_label">New to Twitter?</string>
+    <string name="text_signUp">Create an Account.</string>
+    <string name="login_btn">Log In</string>
+</resources>
