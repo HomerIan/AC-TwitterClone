@@ -68,6 +68,11 @@ public class SignUp extends AppCompatActivity {
                 loginOnClicked(view);
             }
         });
+
+        //if user doesn't logout yet
+        if(ParseUser.getCurrentUser() != null){
+            transitionToSocialMediaActivity();
+        }
     }//onCreate
 
     public void loginOnClicked(View view){
@@ -78,7 +83,6 @@ public class SignUp extends AppCompatActivity {
         mLastClickTime = SystemClock.elapsedRealtime();
         //txtLogin.setTextColor(Color.parseColor("#FFFFFF"));
         transitionToLoginActivity();
-        finish();
     }
 
     public void signUpOnClicked(View view) {
@@ -102,7 +106,7 @@ public class SignUp extends AppCompatActivity {
             appUser.setPassword(edtSignUpPassword.getText().toString());
 
             final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Signing up" + edtSignUpUsername.getText().toString() + ", Please wait...");
+            progressDialog.setMessage("Signing up " + edtSignUpUsername.getText().toString() + ", Please wait...");
             progressDialog.show();
 
             appUser.signUpInBackground(new SignUpCallback() {
@@ -136,10 +140,12 @@ public class SignUp extends AppCompatActivity {
     private void transitionToLoginActivity(){
         Intent intent = new Intent(SignUp.this, LoginActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void transitionToSocialMediaActivity(){
         Intent intent = new Intent(SignUp.this, SocialMediaActivity.class);
         startActivity(intent);
+        finish();
     }
 }

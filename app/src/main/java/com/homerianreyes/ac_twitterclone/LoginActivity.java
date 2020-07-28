@@ -52,7 +52,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         txtSignUp = findViewById(R.id.txtSignUp);
         txtSignUp.setOnClickListener(this);
 
-    }
+        if(ParseUser.getCurrentUser() != null){
+            transitionToSocialMediaActivity();
+        }
+    }//onCreate
 
     @Override
     public void onClick(View view) {
@@ -99,7 +102,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             case R.id.txtSignUp:
                 transitionToSignUpActivity();
-                finish();
                 break;
         }
     }
@@ -107,10 +109,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void transitionToSignUpActivity() {
         Intent intent = new Intent(LoginActivity.this, SignUp.class);
         startActivity(intent);
+        finish();
     }
 
     private void transitionToSocialMediaActivity(){
         Intent intent = new Intent(LoginActivity.this, SocialMediaActivity.class);
         startActivity(intent);
+        finish();
     }
 }

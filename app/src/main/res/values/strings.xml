@@ -21,4 +21,8 @@
     <string name="signUp_label">New to Twitter?</string>
     <string name="text_signUp">Create an Account.</string>
     <string name="login_btn">Log In</string>
+
+    <!--Social Media-->
+    <string name="logout_user_item">Log out</string>
+    <string name="app_backgound">twitter background</string>
 </resources>
