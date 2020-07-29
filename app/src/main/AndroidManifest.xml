@@ -10,8 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SocialMediaActivity"></activity>
-        <activity android:name=".LoginActivity" />
+
         <activity android:name=".SignUp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,6 +18,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".SendTweetActivity"/>
+           <!-- android:parentActivityName=".SocialMediaActivity" -->
+
+        <activity android:name=".SocialMediaActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".LoginActivity" />
 
         <meta-data
             android:name="com.parse.SERVER_URL"
@@ -30,9 +37,8 @@
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

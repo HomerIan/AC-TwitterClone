@@ -3,8 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/logoutUserItem"
+        android:id="@+id/goToTweetItem"
         android:orderInCategory="100"
+        android:title="@string/send_tweet_item"
+        android:icon="@drawable/send_tweet"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/logoutUserItem"
+        android:orderInCategory="101"
         android:title="@string/logout_user_item"
         app:showAsAction="never"/>
+
 </menu>

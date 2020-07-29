@@ -1,5 +1,6 @@
 package com.homerianreyes.ac_twitterclone;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,12 +25,14 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ListView listView;
     private ArrayList<String> arrayList;
     private ArrayAdapter arrayAdapter;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,9 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
         setContentView(R.layout.activity_social_media);
 
         setTitle("Twitter Clone");
+        toolbar = findViewById(R.id.myToolbar);
+        setSupportActionBar(toolbar);
+
 
         FancyToast.makeText(this, "Welcome " + ParseUser.getCurrentUser().getUsername(), FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
 
@@ -47,6 +53,9 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         listView.setOnItemClickListener(this);
 
+        final ProgressDialog progressDialog = new ProgressDialog(SocialMediaActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
         //try catch cuz there might be no users and the app will crush
         try {
             //get users in parse server
@@ -79,6 +88,7 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
                             }//for loop
                         }
                     }
+                    progressDialog.dismiss();
                 }
             });
         } catch (Exception e) {
@@ -97,19 +107,31 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        ParseUser.getCurrentUser().logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
-                //logging out
-                if (e == null){
-                    transitionToLoginActivity();
-                } else {
-                    e.printStackTrace();
+
+        if (item.getItemId() == R.id.goToTweetItem){
+            transitionToSendTweetActivity();
+
+        } else if (item.getItemId() == R.id.logoutUserItem) {
+
+            ParseUser.getCurrentUser().logOutInBackground(new LogOutCallback() {
+                @Override
+                public void done(ParseException e) {
+                    //logging out
+                    if (e == null){
+                        transitionToLoginActivity();
+                    } else {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void transitionToSendTweetActivity() {
+        Intent intent = new Intent(SocialMediaActivity.this, SendTweetActivity.class);
+        startActivity(intent);
     }
 
     private void transitionToLoginActivity(){
@@ -141,7 +163,7 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
             //add the updated list of followed users
             ParseUser.getCurrentUser().put("followOf", currentUserFollowOfList);
         }
-        //sve the followed users in server
+        //save the followed users in server
         ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -152,4 +174,5 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
             }
         });
     }
+
 }

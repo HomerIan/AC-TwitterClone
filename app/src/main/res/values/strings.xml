@@ -25,4 +25,11 @@
     <!--Social Media-->
     <string name="logout_user_item">Log out</string>
     <string name="app_backgound">twitter background</string>
+    <string name="send_tweet_item">tweet</string>
+
+    <!-- Send Tweet Activity -->
+    <string name="tweet">Tweet</string>
+    <string name="txt_tweet">Tweet Here!</string>
+    <string name="edt_tweet">What\'s happening?</string>
+    <string name="btn_view_other_tweets">View other user\'s tweets!</string>
 </resources>
