@@ -6,6 +6,5 @@
         android:id="@+id/sendTweetItem"
         android:title="@string/tweet"
         app:showAsAction="always|withText"/>
-    <!--  android:icon="@drawable/button_tweet" -->
 
 </menu>

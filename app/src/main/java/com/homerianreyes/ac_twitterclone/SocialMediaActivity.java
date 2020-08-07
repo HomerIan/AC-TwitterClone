@@ -26,6 +26,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -33,6 +34,7 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     private ArrayList<String> arrayList;
     private ArrayAdapter arrayAdapter;
     private Toolbar toolbar;
+    private SwipeRefreshLayout swipeRefreshLayoutContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
 
         FancyToast.makeText(this, "Welcome " + ParseUser.getCurrentUser().getUsername(), FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
 
+        swipeRefreshLayoutContainer = findViewById(R.id.swipeRefreshLayoutContainer);
         listView = findViewById(R.id.listView);
         arrayList = new ArrayList<>();
         arrayAdapter = new ArrayAdapter(SocialMediaActivity.this, android.R.layout.simple_list_item_checked, arrayList);
@@ -94,6 +97,56 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        swipeRefreshLayoutContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                try {
+
+                    ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+                    parseQuery.whereNotEqualTo("username", ParseUser.getCurrentUser().getUsername());
+                    parseQuery.whereNotContainedIn("username", arrayList);
+
+                    parseQuery.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> users, ParseException e) {
+
+                            if (users.size() > 0) {
+
+                                if (e == null) {
+
+                                    for (ParseUser user : users){
+                                        arrayList.add(user.getUsername());
+                                    }
+                                    arrayAdapter.notifyDataSetChanged();
+
+                                    //checking users who followed the current user
+                                    for (String twitterUsers: arrayList) {
+                                        //if current user following other users
+                                        if (ParseUser.getCurrentUser().getList("followOf") != null) {
+
+                                            if (ParseUser.getCurrentUser().getList("followOf").contains(twitterUsers)){
+                                                listView.setItemChecked(arrayList.indexOf(twitterUsers), true);
+                                            }
+                                        }
+                                    }//for loop
+                                    if (swipeRefreshLayoutContainer.isRefreshing()) {
+                                        swipeRefreshLayoutContainer.setRefreshing(false);
+                                        }
+                                }
+                            } else {
+                                if (swipeRefreshLayoutContainer.isRefreshing()){
+                                    swipeRefreshLayoutContainer.setRefreshing(false);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }//onCreate
 

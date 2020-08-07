@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -25,12 +24,15 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class SendTweetActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText edtTweet;
     private ListView listViewOtherTweets;
-    private Button btnViewOtherTweets;
+    private SwipeRefreshLayout swipeRefreshLayoutContainerTweet;
+    private HashMap<String, String> userTweet;
+    private ArrayList<String> arraytweetList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +44,100 @@ public class SendTweetActivity extends AppCompatActivity implements View.OnClick
 
         edtTweet = findViewById(R.id.edtTweet);
         listViewOtherTweets = findViewById(R.id.listViewOtherTweets);
+        swipeRefreshLayoutContainerTweet = findViewById(R.id.swipeRefreshLayoutContainerTweet);
 
-        btnViewOtherTweets = findViewById(R.id.btnViewOtherTweets);
-        btnViewOtherTweets.setOnClickListener(this);
+        final ArrayList<HashMap<String, String>> tweetList = new ArrayList<>();
+        final SimpleAdapter simpleAdapter = new SimpleAdapter(SendTweetActivity.this,
+                tweetList,
+                android.R.layout.simple_list_item_2,
+                new String[] {"tweetUsername", "tweetValue"},
+                new int[] {android.R.id.text1, android.R.id.text2});
+
+        final ProgressDialog progressDialog = new ProgressDialog(SendTweetActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        //try block if users has or doesn't have tweets yet
+        try {
+
+            ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("MyTweet");
+            parseQuery.whereContainedIn("username", ParseUser.getCurrentUser().getList("followOf"));
+            parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> followedUsers, ParseException e) {
+
+                    if (followedUsers.size() > 0 && e == null){
+
+                        for (ParseObject followedUser : followedUsers){
+
+                            userTweet = new HashMap<>();
+                            userTweet.put("tweetUsername", followedUser.getString("username"));
+                            userTweet.put("tweetValue", followedUser.getString("tweet"));
+                            tweetList.add(userTweet);
+
+                        }
+                        listViewOtherTweets.setAdapter(simpleAdapter);
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        swipeRefreshLayoutContainerTweet.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                try {
+
+                    ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("MyTweet");
+                    parseQuery.whereContainedIn("username", ParseUser.getCurrentUser().getList("followOf"));
+                    arraytweetList = new ArrayList<>();
+                    for(HashMap<String, String> tweet : tweetList){
+                        arraytweetList.add(tweet.get("tweetValue"));
+                    }
+                    parseQuery.whereNotContainedIn("tweet", arraytweetList);
+                    parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> followedUsers, ParseException e) {
+
+                            if (followedUsers.size() > 0){
+
+                                if (e == null) {
+
+                                    for (ParseObject followedUser : followedUsers) {
+
+                                        HashMap<String, String> userTweet = new HashMap<>();
+                                        userTweet.put("tweetUsername", followedUser.getString("username"));
+                                        userTweet.put("tweetValue", followedUser.getString("tweet"));
+                                        tweetList.add(userTweet);
+
+                                    }
+                                    simpleAdapter.notifyDataSetChanged();
+
+                                    if (swipeRefreshLayoutContainerTweet.isRefreshing()) {
+                                        swipeRefreshLayoutContainerTweet.setRefreshing(false);
+                                    }
+                                }
+                            } else {
+                                    if (swipeRefreshLayoutContainerTweet.isRefreshing()) {
+                                        swipeRefreshLayoutContainerTweet.setRefreshing(false);
+                                    }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }//onCreate
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         getMenuInflater().inflate(R.menu.my_tweet_menu, menu);
-        //menu.findItem(R.id.sendTweetItem).setEnabled(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -103,45 +188,9 @@ public class SendTweetActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View view) {
 
-        final ArrayList<HashMap<String, String>> tweetList = new ArrayList<>();
-        final SimpleAdapter simpleAdapter = new SimpleAdapter(SendTweetActivity.this,
-                                                                tweetList,
-                                                                android.R.layout.simple_list_item_2,
-                                                                new String[] {"tweetUsername", "tweetValue"},
-                                                                new int[] {android.R.id.text1, android.R.id.text2});
 
-        final ProgressDialog progressDialog = new ProgressDialog(SendTweetActivity.this);
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        //try block if users has or doesn't have tweets yet
-        try {
-
-            ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("MyTweet");
-            parseQuery.whereContainedIn("username", ParseUser.getCurrentUser().getList("followOf"));
-            parseQuery.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> followedUsers, ParseException e) {
-
-                    if (followedUsers.size() > 0 && e == null){
-
-                        for (ParseObject followedUser : followedUsers){
-
-                            HashMap<String, String> userTweet = new HashMap<>();
-                            userTweet.put("tweetUsername", followedUser.getString("username"));
-                            userTweet.put("tweetValue", followedUser.getString("tweet"));
-                            tweetList.add(userTweet);
-
-                        }
-                        listViewOtherTweets.setAdapter(simpleAdapter);
-                        progressDialog.dismiss();
-                    }
-                }
-            });
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
+
     @Override
     public boolean onSupportNavigateUp(){
         finish();
